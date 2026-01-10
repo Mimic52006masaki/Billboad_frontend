@@ -1,14 +1,14 @@
 import { useEffect } from "react";
 import { useState } from "react";
-import { Link } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 import { generateAppleMusicSearchUrl } from './lib/appleMusic';
 
 const API_BASE = import.meta.env.VITE_API_BASE || 'http://localhost:3000/api/v1';
 
-function Home() {
+function ChartHistory() {
+  const { chartDate } = useParams();
   const [songs, setSongs] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [scraping, setScraping] = useState(false);
   const [error, setError] = useState(null);
   const [copied, setCopied] = useState(false);
   const [selectedSongs, setSelectedSongs] = useState(() => {
@@ -19,7 +19,7 @@ function Home() {
 
   useEffect(() => {
     fetchSongs();
-  }, []);
+  }, [chartDate]);
 
   useEffect(() => {
     localStorage.setItem('selectedSongs', JSON.stringify(selectedSongs));
@@ -29,7 +29,7 @@ function Home() {
     setLoading(true);
     setError(null);
     try {
-      const res = await fetch(`${API_BASE}/songs`);
+      const res = await fetch(`${API_BASE}/songs?chart_date=${chartDate}`);
       if (!res.ok) throw new Error(`HTTP${res.status}`);
       const data = await res.json();
       setSongs(data);
@@ -40,34 +40,18 @@ function Home() {
     }
   }
 
-  async function handleScrape() {
-    setScraping(true);
-    setError(null);
-    try {
-      const res = await fetch(`${API_BASE}/scrapes`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ async: false })
-      });
-      if (!res.ok) {
-        const err = await res.json().catch(() => ({ message: res.statusText }));
-        throw new Error(err.message || res.statusText);
-      }
-      await fetchSongs();
-    } catch (err) {
-      setError(err.message);
-    } finally {
-      setScraping(false);
-    }
-  }
-
   function toggleSelected(rank) {
     setSelectedSongs(prev =>
       prev.includes(rank) ? prev.filter(r => r !== rank) : [...prev, rank]
     );
   }
 
-
+  function searchSelected() {
+    selectedSongs.forEach(rank => {
+      const song = songs.find(s => s.rank === rank);
+      if (song) window.open(generateAppleMusicSearchUrl(song), '_blank');
+    });
+  }
 
   function copyTable() {
     if (songs.length === 0) return;
@@ -111,16 +95,16 @@ function Home() {
           <span className="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">主要機能</span>
         </div>
         <nav className="flex-1 px-3 py-4 space-y-1 overflow-y-auto">
-          <Link to="/" className="group flex items-center px-3 py-3 text-sm font-medium rounded-md bg-primary text-white shadow-sm">
-            <span className="material-icons-round text-xl mr-3 opacity-90">leaderboard</span>
+          <Link to="/" className="group flex items-center px-3 py-3 text-sm font-medium rounded-md text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-slate-100 transition-colors">
+            <span className="material-icons-round text-xl mr-3 text-slate-400 group-hover:text-slate-500 dark:text-slate-500 dark:group-hover:text-slate-300">leaderboard</span>
             ホーム (最新ランキング)
           </Link>
           <Link to="/charts/diff" className="group flex items-center px-3 py-3 text-sm font-medium rounded-md text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-slate-100 transition-colors">
             <span className="material-icons-round text-xl mr-3 text-slate-400 group-hover:text-slate-500 dark:text-slate-500 dark:group-hover:text-slate-300">compare_arrows</span>
             差分ページ (NEW/OUT)
           </Link>
-          <Link to="/history" className="group flex items-center px-3 py-3 text-sm font-medium rounded-md text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-slate-100 transition-colors">
-            <span className="material-icons-round text-xl mr-3 text-slate-400 group-hover:text-slate-500 dark:text-slate-500 dark:group-hover:text-slate-300">history</span>
+          <Link to="/history" className="group flex items-center px-3 py-3 text-sm font-medium rounded-md bg-primary text-white shadow-sm">
+            <span className="material-icons-round text-xl mr-3 opacity-90">history</span>
             ランキング履歴
           </Link>
         </nav>
@@ -131,22 +115,14 @@ function Home() {
             <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
               <div>
                 <h1 className="text-2xl font-bold text-slate-900 dark:text-white flex items-center gap-2">
-                  <span className="material-icons-round text-primary">equalizer</span>
-                  Billboard Hot 100
+                  <span className="material-icons-round text-primary">leaderboard</span>
+                  Billboard Hot 100 - {chartDate}
                 </h1>
                 <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">Weekly music chart rankings and insights</p>
               </div>
               <div className="flex flex-wrap items-center gap-3">
                 <button
                   className="inline-flex items-center px-4 py-2 bg-primary hover:bg-blue-600 text-white text-sm font-medium rounded-lg shadow-sm transition-all focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 dark:focus:ring-offset-slate-900"
-                  onClick={handleScrape}
-                  disabled={scraping}
-                >
-                  <span className="material-icons-round text-lg mr-2">refresh</span>
-                  {scraping ? 'スクレイピング中...' : '最新を取得'}
-                </button>
-                <button
-                  className="inline-flex items-center px-4 py-2 bg-white dark:bg-slate-700 border border-slate-300 dark:border-slate-600 hover:bg-slate-50 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-200 text-sm font-medium rounded-lg shadow-sm transition-all"
                   onClick={fetchSongs}
                   disabled={loading}
                 >
@@ -160,7 +136,6 @@ function Home() {
                   <span className="material-icons-round text-lg mr-2">content_copy</span>
                   表をコピー
                 </button>
-
               </div>
             </div>
           </div>
@@ -254,4 +229,4 @@ function Home() {
   )
 }
 
-export default Home
+export default ChartHistory
