@@ -18,18 +18,38 @@ function DiffPage() {
     setError(null);
     try {
       const res = await fetch(`${API_BASE}/charts/diff/latest`);
+
+      if (res.status === 400) {
+        const data = await res.json();
+        setError(data.error || '差分を表示できません');
+        return;
+      }
+
       if (!res.ok) throw new Error(`HTTP${res.status}`);
       const diff = await res.json();
       setData(diff);
     } catch (err) {
-      setError(err.message);
+      setError('通信エラーが発生しました');
     } finally {
       setLoading(false);
     }
   }
 
   if (loading) return <div className="max-w-4xl mx-auto p-6">読み込み中...</div>;
-  if (error) return <div className="max-w-4xl mx-auto p-6 text-red-600">{error}</div>;
+  if (error) return (
+    <div className="flex flex-col items-center justify-center h-screen gap-4">
+      <p className="text-slate-600 dark:text-slate-400 text-center">
+        {error}
+      </p>
+      <Link
+        to="/"
+        className="inline-flex items-center px-4 py-2 bg-primary text-white rounded-lg hover:bg-blue-600 transition"
+      >
+        <span className="material-icons-round mr-2">home</span>
+        トップに戻る
+      </Link>
+    </div>
+  );
   if (!data) return <div className="max-w-4xl mx-auto p-6">データがありません</div>;
 
   return (
