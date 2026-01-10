@@ -16,9 +16,6 @@ function ChartHistoryList() {
     setLoading(true);
     setError(null);
     try {
-      // Note: We need to add an endpoint to get all chart dates
-      // For now, we'll use a placeholder or fetch from existing data
-      // Since we don't have a charts index endpoint, let's create one
       const res = await fetch(`${API_BASE}/charts/history`);
       if (!res.ok) throw new Error(`HTTP${res.status}`);
       const data = await res.json();
@@ -27,6 +24,21 @@ function ChartHistoryList() {
       setError(err.message);
     } finally {
       setLoading(false);
+    }
+  }
+
+  async function handleDelete(chartDate) {
+    if (!confirm(`${chartDate} のランキングを削除しますか？`)) return;
+
+    try {
+      const res = await fetch(`${API_BASE}/charts/${chartDate}`, {
+        method: 'DELETE',
+      });
+      if (!res.ok) throw new Error(`HTTP${res.status}`);
+      // Refresh the list
+      fetchCharts();
+    } catch (err) {
+      alert(`削除に失敗しました: ${err.message}`);
     }
   }
 
@@ -70,9 +82,8 @@ function ChartHistoryList() {
           ) : (
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
               {charts.map((chart) => (
-                <Link
+                <div
                   key={chart.chart_date}
-                  to={`/charts/${chart.chart_date}`}
                   className="bg-surface-light dark:bg-surface-dark rounded-xl shadow-lg border border-slate-200 dark:border-slate-700 p-6 hover:shadow-xl transition-shadow"
                 >
                   <h3 className="text-lg font-semibold text-slate-900 dark:text-white mb-2">
@@ -81,11 +92,23 @@ function ChartHistoryList() {
                   <p className="text-sm text-slate-500 dark:text-slate-400">
                     Billboard Hot 100
                   </p>
-                  <div className="mt-4 flex items-center text-primary">
-                    <span className="material-icons-round text-lg mr-2">visibility</span>
-                    閲覧する
+                  <div className="mt-4 flex items-center justify-between">
+                    <Link
+                      to={`/charts/${chart.chart_date}`}
+                      className="flex items-center text-primary"
+                    >
+                      <span className="material-icons-round text-lg mr-2">visibility</span>
+                      閲覧する
+                    </Link>
+                    <button
+                      onClick={() => handleDelete(chart.chart_date)}
+                      className="flex items-center text-red-600 hover:text-red-800"
+                      title="削除"
+                    >
+                      <span className="material-icons-round text-lg">delete</span>
+                    </button>
                   </div>
-                </Link>
+                </div>
               ))}
             </div>
           )}

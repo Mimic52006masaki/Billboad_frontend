@@ -81,6 +81,22 @@ function ChartHistory() {
     setAllSelected(!allSelected);
   };
 
+  async function handleDelete() {
+    if (!confirm(`${chartDate} のランキングを削除しますか？`)) return;
+
+    try {
+      const res = await fetch(`${API_BASE}/charts/${chartDate}`, {
+        method: 'DELETE',
+      });
+      if (!res.ok) throw new Error(`HTTP${res.status}`);
+      alert('削除しました');
+      // Navigate back to history list
+      window.location.href = '/history';
+    } catch (err) {
+      alert(`削除に失敗しました: ${err.message}`);
+    }
+  }
+
   const getRankColor = (rank) => {
     if (rank === 1) return 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-400';
     if (rank === 2) return 'bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300';
@@ -135,6 +151,13 @@ function ChartHistory() {
                 >
                   <span className="material-icons-round text-lg mr-2">content_copy</span>
                   表をコピー
+                </button>
+                <button
+                  className="inline-flex items-center px-4 py-2 bg-red-500 hover:bg-red-600 text-white text-sm font-medium rounded-lg shadow-sm transition-all"
+                  onClick={handleDelete}
+                >
+                  <span className="material-icons-round text-lg mr-2">delete</span>
+                  削除
                 </button>
               </div>
             </div>
