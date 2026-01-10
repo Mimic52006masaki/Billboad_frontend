@@ -59,6 +59,7 @@ function ChartHistoryList() {
               ランキング履歴
             </h1>
             <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">過去のBillboard Hot 100ランキングを閲覧できます</p>
+            <p className="mt-1 text-xs text-slate-400 dark:text-slate-500">※ ランキング内容に変化があった日のみ表示されます</p>
           </div>
         </header>
         <div className="flex-1 overflow-y-auto p-8">

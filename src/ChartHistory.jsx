@@ -118,7 +118,7 @@ function ChartHistory() {
                   <span className="material-icons-round text-primary">leaderboard</span>
                   Billboard Hot 100 - {chartDate}
                 </h1>
-                <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">Weekly music chart rankings and insights</p>
+                <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">Ranking snapshot (saved only when changes occur)</p>
               </div>
               <div className="flex flex-wrap items-center gap-3">
                 <button
@@ -169,7 +169,7 @@ function ChartHistory() {
                     <tr><td className="px-6 py-4 text-center" colSpan="6">データがありません</td></tr>
                   ) : (
                     songs.map((song) => (
-                      <tr key={`${song.rank}-${song.chart_date}`} className="group hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors">
+                      <tr key={song.id} className="group hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors">
                         <td className="px-6 py-4 text-center">
                           <input
                             checked={selectedSongs.includes(song.rank)}

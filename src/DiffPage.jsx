@@ -58,7 +58,7 @@ function DiffPage() {
                   <span className="material-icons-round text-primary">compare_arrows</span>
                   差分ページ (NEW/OUT)
                 </h1>
-                <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">比較対象：{data.latest_chart.chart_date} ←→ {data.previous_chart.chart_date}</p>
+                <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">比較対象：直近の変化（{data.latest_chart.chart_date}）と前回の変化（{data.previous_chart.chart_date}）</p>
               </div>
             </div>
           </div>
@@ -68,7 +68,7 @@ function DiffPage() {
             <div>
               <h2 className="text-xl font-bold mb-4 text-green-600 dark:text-green-400 flex items-center gap-2">
                 <span className="material-icons-round">trending_up</span>
-                新規ランクイン曲 (NEW)
+                新規ランクイン曲（前回の変化以降）
               </h2>
               {data.new_entries.length === 0 ? (
                 <p className="text-slate-500 dark:text-slate-400">該当する曲はありません</p>
