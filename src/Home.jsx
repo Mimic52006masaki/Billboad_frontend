@@ -123,6 +123,10 @@ function Home() {
             <span className="material-icons-round text-xl mr-3 text-slate-400 group-hover:text-slate-500 dark:text-slate-500 dark:group-hover:text-slate-300">history</span>
             ランキング履歴
           </Link>
+          <Link to="/weekly-update" className="group flex items-center px-3 py-3 text-sm font-medium rounded-md text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-slate-100 transition-colors">
+            <span className="material-icons-round text-xl mr-3 text-slate-400">playlist_add_check</span>
+            週間Apple Music更新
+          </Link>
         </nav>
       </aside>
       <main className="flex-1 flex flex-col h-full overflow-hidden relative">
